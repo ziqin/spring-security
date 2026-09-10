@@ -251,9 +251,7 @@ public class HeadersConfigurer<H extends HttpSecurityBuilder<H>>
 	 */
 	public HeadersConfigurer<H> contentSecurityPolicy(
 			Customizer<ContentSecurityPolicyConfig> contentSecurityCustomizer) {
-		this.contentSecurityPolicy.writer = new ContentSecurityPolicyHeaderWriter();
-		this.contentSecurityPolicy.nonceGeneratingFilter = new ContentSecurityPolicyNonceGeneratingFilter();
-		contentSecurityCustomizer.customize(this.contentSecurityPolicy);
+		contentSecurityCustomizer.customize(this.contentSecurityPolicy.enable());
 		return HeadersConfigurer.this;
 	}
 
@@ -1031,6 +1029,16 @@ public class HeadersConfigurer<H extends HttpSecurityBuilder<H>>
 			PathPatternRequestMatcher.Builder builder = HeadersConfigurer.this.getRequestMatcherBuilder();
 			OrRequestMatcher matcher = new OrRequestMatcher(Arrays.stream(pathPatterns).map(builder::matcher).toList());
 			return this.requestMatcher(matcher);
+		}
+
+		private ContentSecurityPolicyConfig enable() {
+			if (this.writer == null) {
+				this.writer = new ContentSecurityPolicyHeaderWriter();
+			}
+			if (this.nonceGeneratingFilter == null) {
+				this.nonceGeneratingFilter = new ContentSecurityPolicyNonceGeneratingFilter();
+			}
+			return this;
 		}
 
 	}
